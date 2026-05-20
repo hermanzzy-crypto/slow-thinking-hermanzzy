@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>思考跑步机 · {{DATE}}</title>
+<style>
+  :root {
+    --color-bg: #FFFFFF;
+    --color-bg-subtle: #F7F8FC;
+    --color-bg-mute: #FAFBFC;
+    --color-brand-blue: #1664FF;
+    --color-brand-blue-hover: #0E55E0;
+    --color-brand-gradient: linear-gradient(90deg, #4E6EFF, #8A5BFF, #C45BFF);
+    --color-cta-gradient: linear-gradient(90deg, #1664FF, #6B5BFF);
+    --color-soft-blue: #E8F3FF;
+    --color-soft-purple: #F3E8FF;
+    --color-soft-mix: linear-gradient(135deg, #EEF2FF, #F3E8FF);
+    --color-text-primary: #1D2129;
+    --color-text-secondary: #4E5969;
+    --color-text-tertiary: #86909C;
+    --color-text-placeholder: #C9CDD4;
+    --color-border: #F2F3F5;
+    --color-border-strong: #E5E6EB;
+    --color-tag-red-bg: #FFECE8;
+    --color-tag-red-text: #F53F3F;
+    --color-tag-blue-bg: #E8F3FF;
+    --color-tag-blue-text: #1664FF;
+    --radius-card: 16px;
+    --radius-mini: 12px;
+    --radius-button: 6px;
+    --radius-capsule: 9999px;
+    --shadow-card-hover: 0 8px 24px rgba(0,0,0,.06);
+    --shadow-soft: 0 2px 8px rgba(0,0,0,.04);
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease-out;
+    --grid-max-width: 1200px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Inter", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+
+  /* Hero 区柔光背景（节制使用品牌色） */
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(60% 80% at 20% 20%, rgba(100,140,255,.10), transparent),
+      radial-gradient(50% 70% at 90% 10%, rgba(180,120,255,.08), transparent),
+      var(--color-bg);
+    padding: 80px 24px 56px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-inner { max-width: var(--grid-max-width); margin: 0 auto; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-tag-blue-bg);
+    color: var(--color-tag-blue-text);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: var(--radius-capsule);
+    margin-bottom: 20px;
+  }
+
+  h1.display {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+  h1.display .gradient-text {
+    background: var(--color-brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    max-width: 720px;
+    margin: 0 auto 28px;
+  }
+  .meta-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 24px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-capsule);
+    box-shadow: var(--shadow-soft);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+  .meta-row .divider { width: 1px; height: 16px; background: var(--color-border-strong); }
+  .meta-row strong { color: var(--color-text-primary); font-weight: 600; }
+
+  /* 主容器 */
+  main {
+    max-width: var(--grid-max-width);
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+  section { margin-top: 80px; }
+  section:first-child { margin-top: 56px; }
+
+  .section-header { margin-bottom: 40px; text-align: center; }
+  .section-title {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    margin-bottom: 12px;
+  }
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--color-text-tertiary);
+    line-height: 1.6;
+  }
+
+  /* 素材卡 */
+  .source-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 28px 32px;
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+  }
+  .source-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--color-brand-gradient);
+  }
+  .source-card .source-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-brand-blue);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .source-card .source-body {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+  }
+  .source-card .source-body a {
+    color: var(--color-brand-blue);
+    text-decoration: none;
+  }
+  .source-card .source-body a:hover { text-decoration: underline; }
+
+  /* 卡片栅格 */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    transition: var(--transition-normal);
+  }
+  .cards-grid.has-selection .card:not(.selected) {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    border-width: 0;
+    overflow: hidden;
+  }
+  .cards-grid.has-selection .card.selected {
+    grid-column: 1 / -1;
+  }
+
+  /* 卡片基础 */
+  .card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+  .card.selected {
+    cursor: default;
+    box-shadow: var(--shadow-card-hover);
+  }
+  .card.selected:hover { transform: none; }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--color-brand-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(138, 91, 255, 0.2);
+  }
+  .card-name {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+  .card-tagline {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .card-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-brand-blue);
+    font-weight: 500;
+  }
+  .card.selected .card-hint { display: none; }
+
+  /* 展开后内容 */
+  .card-content { display: none; }
+  .card.selected .card-content {
+    display: block;
+    animation: fadeIn 400ms ease-out;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-block { margin-bottom: 32px; }
+  .section-block:last-child { margin-bottom: 0; }
+
+  .block-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .block-label .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-brand-blue);
+  }
+
+  /* 解读卡（mini-card 风格） */
+  .reading-box {
+    background: var(--color-soft-mix);
+    border-radius: var(--radius-mini);
+    padding: 20px 24px;
+    font-size: 15px;
+    color: var(--color-text-primary);
+    line-height: 1.75;
+  }
+  .logic-box {
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-mini);
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* 问题块 */
+  .question-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-mini);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    transition: var(--transition-normal);
+  }
+  .question-block:hover { border-color: var(--color-border-strong); }
+  .question-block:focus-within {
+    border-color: var(--color-brand-blue);
+    box-shadow: 0 0 0 3px rgba(22, 100, 255, 0.08);
+  }
+  .question-text {
+    font-size: 15px;
+    color: var(--color-text-primary);
+    font-weight: 500;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .question-num {
+    display: inline-block;
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    background: var(--color-tag-blue-bg);
+    color: var(--color-tag-blue-text);
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-right: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 60px;
+    padding: 0;
+  }
+  textarea::placeholder { color: var(--color-text-placeholder); }
+  textarea:focus { outline: none; }
+
+  .insight-block, .hook-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-mini);
+    padding: 20px 24px;
+    transition: var(--transition-normal);
+  }
+  .insight-block:focus-within, .hook-block:focus-within {
+    border-color: var(--color-brand-blue);
+    box-shadow: 0 0 0 3px rgba(22, 100, 255, 0.08);
+  }
+  .insight-block { background: var(--color-soft-blue); border-color: rgba(22, 100, 255, 0.12); }
+  .insight-block:focus-within { background: var(--color-bg); }
+  .insight-block textarea { min-height: 70px; font-size: 15px; }
+
+  /* 数据指标条 */
+  .stat-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 24px 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    margin: 32px 0;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .stat-num .unit {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 4px;
+    color: var(--color-text-secondary);
+  }
+  .stat-desc {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 4px;
+  }
+  .stat-divider { width: 1px; height: 40px; background: var(--color-border-strong); }
+
+  /* 按钮区 */
+  .actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 48px;
+  }
+  .actions.hidden { display: none; }
+
+  button {
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Hero 黑色胶囊（最强 CTA） */
+  .btn-hero {
+    background: var(--color-text-primary);
+    color: #fff;
+    height: 48px;
+    padding: 0 32px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--radius-capsule);
+    box-shadow: 0 4px 14px rgba(29, 33, 41, 0.18);
+  }
+  .btn-hero:hover {
+    background: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(29, 33, 41, 0.28);
+  }
+
+  /* Primary 主蓝按钮 */
+  .btn-primary {
+    background: var(--color-brand-blue);
+    color: #fff;
+    height: 44px;
+    padding: 0 24px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius-button);
+  }
+  .btn-primary:hover {
+    background: var(--color-brand-blue-hover);
+    transform: translateY(-1px);
+  }
+
+  /* Secondary 描边按钮 */
+  .btn-secondary {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-strong);
+    height: 44px;
+    padding: 0 24px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius-capsule);
+  }
+  .btn-secondary:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-bg-subtle);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    background: var(--color-text-primary);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: var(--radius-capsule);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    transition: transform 400ms ease-out;
+    z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Footer */
+  footer {
+    background: #111827;
+    color: #9CA3AF;
+    padding: 48px 24px;
+    margin-top: 80px;
+    text-align: center;
+    font-size: 13px;
+  }
+  footer strong { color: #fff; font-weight: 600; }
+
+  /* 响应式 */
+  @media (max-width: 1024px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    h1.display { font-size: 40px; }
+    .section-title { font-size: 28px; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: 56px 20px 40px; }
+    .stat-bar { gap: 20px; flex-wrap: wrap; }
+    .stat-divider { display: none; }
+    .actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge">🏃 思考跑步机 · Day · {{DATE}}</div>
+    <h1 class="display">把答案放一放，<span class="gradient-text">先把问题想透</span></h1>
+    <p class="subtitle">每天 5 分钟，刻意切换思考视角。AI 当陪练，不当替身。</p>
+    <div class="meta-row">
+      <span>今日身份 <strong id="identity">{{IDENTITY}}</strong></span>
+      <span class="divider"></span>
+      <span>预计用时 <strong>~5 分钟</strong></span>
+      <span class="divider"></span>
+      <span>思考肌肉 <strong>+1 💪</strong></span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <section>
+    <div class="source-card">
+      <span class="source-label">📰 今日素材</span>
+      <div class="source-body" id="source">{{SOURCE_HTML}}</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">选一张思考卡，换个角度看</h2>
+      <p class="section-subtitle">点击卡片进入深度模式 · 已为你随机抽取 3 张</p>
+    </div>
+
+    <div class="stat-bar">
+      <div class="stat-item">
+        <div class="stat-num">3<span class="unit">张卡</span></div>
+        <div class="stat-desc">今日思考视角</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">5<span class="unit">分钟</span></div>
+        <div class="stat-desc">建议投入时长</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">1<span class="unit">洞察</span></div>
+        <div class="stat-desc">每日核心 take-away</div>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="cardsRow"></div>
+
+    <div class="actions hidden" id="actions">
+      <button class="btn-secondary" onclick="resetSelection()">← 换一张卡</button>
+      <button class="btn-hero" onclick="saveAll()">💾 保存今日思考</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>思考跑步机</strong> · 让"自己想"重新变得稀缺 · {{DATE}}
+</footer>
+
+<div class="toast" id="toast">✅ 已保存到 ~/Downloads/</div>
+
+<script>
+// === 由 Claude 注入 ===
+window.__META__ = {
+  date: "{{DATE}}",
+  identity: "{{IDENTITY}}",
+  source: {{SOURCE_JSON}}
+};
+window.__CARDS__ = {{CARDS_JSON}};
+// 数据结构示例:
+// [{
+//   id: "first-principles",
+//   name: "🔬 第一性原理",
+//   tagline: "剥到不能再剥",
+//   logic: "把现象拆到最基本的物理/经济/人性事实，重新推一遍。",
+//   reading: "作为 [身份]，这意味着...",
+//   questions: ["Q1...", "Q2...", "Q3..."]
+// }, ...]
+
+const row = document.getElementById('cardsRow');
+const actions = document.getElementById('actions');
+
+window.__CARDS__.forEach((c, idx) => {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.id = c.id;
+  el.dataset.idx = idx;
+  el.innerHTML = `
+    <div class="card-icon">${(c.name.match(/^\S+/) || ['💡'])[0]}</div>
+    <div class="card-name">${c.name.replace(/^\S+\s*/, '')}</div>
+    <div class="card-tagline">${c.tagline}</div>
+    <span class="card-hint">点击展开 →</span>
+    <div class="card-content">
+      <div class="section-block">
+        <div class="block-label"><span class="dot"></span>底层逻辑</div>
+        <div class="logic-box">${c.logic}</div>
+      </div>
+      <div class="section-block">
+        <div class="block-label"><span class="dot"></span>本事件解读</div>
+        <div class="reading-box">${c.reading}</div>
+      </div>
+      <div class="section-block">
+        <div class="block-label"><span class="dot"></span>三个追问</div>
+        ${c.questions.map((q, i) => `
+          <div class="question-block">
+            <div class="question-text"><span class="question-num">Q${i+1}</span>${q}</div>
+            <textarea data-field="answer" data-q="${i}" placeholder="写下你的回答..."></textarea>
+          </div>
+        `).join('')}
+      </div>
+      <div class="section-block">
+        <div class="block-label"><span class="dot"></span>我的核心感悟（一句话）</div>
+        <div class="insight-block">
+          <textarea data-field="insight" placeholder="今天最值得带走的洞见是什么？"></textarea>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="block-label"><span class="dot"></span>留给明天的钩子（可选）</div>
+        <div class="hook-block">
+          <textarea data-field="hook" placeholder="这次没想透、明天想接着挖的点..."></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+  el.addEventListener('click', (e) => {
+    if (e.target.tagName === 'TEXTAREA') return;
+    if (el.classList.contains('selected')) return;
+    selectCard(idx);
+  });
+  row.appendChild(el);
+});
+
+function selectCard(idx) {
+  document.querySelectorAll('.card').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('cardsRow').classList.add('has-selection');
+  actions.classList.remove('hidden');
+  setTimeout(() => {
+    document.querySelector('.card.selected').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 350);
+}
+
+function resetSelection() {
+  document.querySelectorAll('.card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('cardsRow').classList.remove('has-selection');
+  actions.classList.add('hidden');
+  document.querySelector('.cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveAll() {
+  const selected = document.querySelector('.card.selected');
+  if (!selected) { alert('请先选一张卡'); return; }
+  const idx = parseInt(selected.dataset.idx);
+  const card = window.__CARDS__[idx];
+
+  const answers = [];
+  selected.querySelectorAll('textarea[data-field="answer"]').forEach(t => {
+    answers.push(t.value.trim());
+  });
+  const insight = selected.querySelector('textarea[data-field="insight"]').value.trim();
+  const hook = selected.querySelector('textarea[data-field="hook"]').value.trim();
+
+  const payload = {
+    date: window.__META__.date,
+    identity: window.__META__.identity,
+    source: window.__META__.source,
+    card: {
+      id: card.id,
+      name: card.name,
+      tagline: card.tagline,
+      logic: card.logic,
+      reading: card.reading,
+      questions: card.questions
+    },
+    answers,
+    insight,
+    hook,
+    saved_at: new Date().toISOString()
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `slow-thinking-${window.__META__.date}.json`;
+  a.click();
+
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
