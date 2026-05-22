@@ -34,29 +34,26 @@ bash install.sh
 |---|------|------|---------|
 | 1 | 🎯 我是谁？ | 10s | 用 setup 配过的默认身份；可临时换 |
 | 2 | 📰 发生了什么？ | 60s | 默认抓 HN Top 3（rank/points/comments 三维度），也支持用户给链接 |
-| 3 | 💡 所以呢？ | 3-4 min | **生成本地 HTML** → 浏览器里翻牌选卡 + 填空 + 保存 JSON |
-| 4 | 💾 沉淀 | 自动 | sediment.mjs 一条命令产 markdown + 同步 Obsidian + 可选飞书 |
+| 3 | 💡 所以呢？ | 3-4 min | 本地服务渲染 HTML → 浏览器里依次走过 3 张卡 + 填空 |
+| 4 | 💾 沉淀 | 自动 | 点保存即直写 Obsidian（本地服务完成）+ 可选飞书镜像 |
 
 **铁律**：Step 3 中 AI 输出 ≤3 句，剩下全部用来**让用户答**。用户答 > AI 答。
 
 ---
 
-## 🎴 10 张思考卡片
+## 🎴 12 个思维模型（v2.0）
 
-| 卡片 | 一句话 |
-|------|-------|
-| 🔬 第一性原理 | 剥到不能再剥 |
-| 🔄 反向思考 | 想成功，先想怎么彻底失败 |
-| 🎲 二阶思考 | 然后呢？再然后呢？ |
-| 💰 机会成本 | 你没做的事，比做了的更贵 |
-| 🦨 反共识 | 大家都对的事，往往大家都错 |
-| 🌉 跨界类比 | 在另一个行业，这是哪年的什么？ |
-| ❓ 五问到底 | Why × 5 |
-| 🎭 视角切换 | 如果你是 X，你会怎么看？ |
-| 🛡️ 钢人论证 | 把对方观点替他完善到最强 |
-| ⛓️ 约束反转 | 如果只能做 1 件事 / 只有 1 个月 |
+按 AI 解决方案专家的五步工作流组织：
 
-每天随机抽 3 张（避开昨天用过的），用户在 HTML 里选 1 张深入。
+| 阶段 | 卡片（一句话） |
+|------|--------------|
+| ① 信息过滤 | 🧩 5W2H · 把通稿剥成硬变量 ／ 📡 信号噪音 · 事实是信号观点是噪音 ／ 🧠 认知偏差 · 给大脑装杀毒软件 |
+| ② 深度分析 | 🔬 第一性原理 · 剥到物理/数学事实 ／ 🔄 逆向思维 · 不问怎么成问怎么败 ／ 📈 Gartner曲线 · 现在处于周期哪段 |
+| ③ 商业推演 | 🎲 第二层思考 · 找非共识与预期差 ／ 🔗 价值链 · 利润在哪层聚集 ／ 🌉 类比 · 像历史哪一幕 ／ 🎯 贝叶斯更新 · 用新证据改写旧信念 |
+| ④ 表达输出 | 🏛️ SCQA · 情景-冲突-疑问-回答 |
+| ⑤ 供需验证 | ⚖️ 供需框架 · 技术可行≠市场成立 |
+
+每天按今日素材的**事件类型智能匹配** 3 张（避开昨天用过的），用户在 HTML 里**依次走过这 3 张**、每张换一个角度作答，最后统一保存。匹配规则见 [CARDS-FORMAT.md](./CARDS-FORMAT.md#抽卡规则智能匹配非随机)。
 
 ---
 
@@ -69,7 +66,7 @@ slow-thinking/                  # 主 skill（symlink 进 ~/.claude/skills/slow-
 ├── HTML-FLOW.md                # Step 3 HTML 渲染 + Step 4 沉淀细节
 ├── PLATFORMS.md                # 跨平台 + 状态存储 + 安装
 ├── install.sh                  # 一键安装两个 skill
-├── cards/thinking-cards.json   # 10 张卡定义
+├── cards/thinking-cards.json   # 12 个思维模型定义（v2.0）
 ├── identity/                   # 身份 context
 │   ├── _generator.md
 │   ├── volcano-engine.md
@@ -78,10 +75,11 @@ slow-thinking/                  # 主 skill（symlink 进 ~/.claude/skills/slow-
 │   ├── interactive.html        # Step 3 渲染模板
 │   └── obsidian.md
 ├── scripts/                    # Node 18+ 跨平台脚本
-│   ├── fetch-hn.mjs
-│   ├── render.mjs
-│   ├── sediment.mjs
-│   └── state.mjs
+│   ├── fetch-hn.mjs            # Step 2 抓 HN Top 3
+│   ├── serve.mjs              # Step 3 本地服务：渲染 HTML + 保存直写 Obsidian
+│   ├── render.mjs             # 仅渲染 HTML（调试 / 静态预览备用）
+│   ├── sediment.mjs           # 结果 → markdown + 写 Obsidian
+│   └── state.mjs              # 状态读写
 ├── state/                      # 本地状态（OpenClaw 不可用时）
 └── setup-slow-thinking/        # 独立配置向导 skill
     └── SKILL.md
@@ -107,9 +105,9 @@ slow-thinking/                  # 主 skill（symlink 进 ~/.claude/skills/slow-
 |------|------|------|
 | Obsidian 主存档 | `~/Desktop/AI资讯积累/思考跑步机/YYYY-MM-DD.md`（默认，可改） | 无 |
 | 飞书移动端镜像 | 飞书云文档「思考跑步机 · <用户名>」 | `lark-cli` |
-| HTML 原始保存 | `~/Downloads/slow-thinking-YYYY-MM-DD.json` | 无 |
+| 兜底 JSON | `~/Downloads/slow-thinking-*.json`（仅在本地服务不可用时下载） | 无 |
 
-所有路径都在 `/setup-slow-thinking` 时配置。
+正常流程下用户点保存即由本地服务**直写 Obsidian**，不产生下载文件。所有路径都在 `/setup-slow-thinking` 时配置。
 
 ---
 

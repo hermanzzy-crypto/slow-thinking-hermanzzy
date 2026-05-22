@@ -1,7 +1,7 @@
 ---
 name: slow-thinking
-version: 2.1.0
-description: 5 分钟刻意思考训练。HTML 交互式翻牌选卡 + 填空，沉淀到 Obsidian。AI 当苏格拉底式陪练，不当答题机。Use when user types /slow-thinking, says "刻意思考", "今日思考", "思考训练", "思考跑步机", or wants a structured thinking-card session against today's news.
+version: 2.2.0
+description: 5 分钟刻意思考训练。HTML 交互式依次走过 3 张思考卡 + 填空，统一沉淀到 Obsidian。AI 当苏格拉底式陪练，不当答题机。Use when user types /slow-thinking, says "刻意思考", "今日思考", "思考训练", "思考跑步机", or wants a structured thinking-card session against today's news.
 argument-hint: "[可选] 思考素材链接；留空则抓 Hacker News Top 3"
 metadata:
   requires:
@@ -38,17 +38,19 @@ metadata:
 
 ### 💡 Step 3 — 所以呢？（3-4 min · HTML 交互）
 
-**不要在终端逐轮追问**。组装 payload → 渲染 HTML → 在浏览器里让用户选卡填空。完整流程见 [HTML-FLOW.md](./HTML-FLOW.md)。
+**不要在终端逐轮追问**。组装 payload → `serve.mjs` 后台起本地服务渲染 HTML → 打开浏览器让用户选卡填空。**打开浏览器的同时，务必把本地服务 URL 一并发到对话里**（误关页面可凭此链接重开，草稿自动恢复）。完整流程见 [HTML-FLOW.md](./HTML-FLOW.md)。
 
 卡片内容生成规则（4 字段）和提问技巧见 [CARDS-FORMAT.md](./CARDS-FORMAT.md) —— **生成内容前必读**。
 
-### 💾 Step 4 — 沉淀（自动）
+### 💾 Step 4 — 沉淀（保存即完成）
 
-用户点"💾 保存今日思考"后 → JSON 落到 `~/Downloads/slow-thinking-YYYY-MM-DD.json`。用户说"完成了"，跑：
+用户在 HTML 点「💾 保存今日思考」→ 浏览器把结果 POST 给本地服务 → 服务自动把 `<date>.md` **直写 Obsidian** 并退出（不下载任何文件）。
 
-```bash
-node <SKILL_DIR>/scripts/sediment.mjs --result ~/Downloads/slow-thinking-YYYY-MM-DD.json
-```
+后台服务退出（输出 `SAVED <path>`）即沉淀完成信号 → agent 读 `<tmpdir>/slow-thinking/result-latest.json` 做可选飞书镜像 + 展示总结。
+
+> 兜底：服务不可用 / `file://` 打开时，保存按钮回退为下载 JSON，此时用户说"完成了"后跑 `node <SKILL_DIR>/scripts/sediment.mjs --latest`。
+
+详见 [HTML-FLOW.md](./HTML-FLOW.md#step-4-沉淀)。
 
 自动产出 markdown + 同步 Obsidian。可选飞书镜像见 [HTML-FLOW.md](./HTML-FLOW.md#step-4-沉淀)。
 
@@ -81,7 +83,7 @@ node <SKILL_DIR>/scripts/sediment.mjs --result ~/Downloads/slow-thinking-YYYY-MM
 - [CARDS-FORMAT.md](./CARDS-FORMAT.md) — 卡片内容生成规则 + 提问技巧
 - [HTML-FLOW.md](./HTML-FLOW.md) — Step 3 HTML 渲染 + Step 4 沉淀细节
 - [PLATFORMS.md](./PLATFORMS.md) — 跨平台说明 + 状态存储 + 安装
-- `<SKILL_DIR>/cards/thinking-cards.json` — 10 张思考卡定义
+- `<SKILL_DIR>/cards/thinking-cards.json` — 12 张思考卡定义（v2.0，按五步工作流分组）
 - `<SKILL_DIR>/identity/*.md` — 身份 context 文件
 
 首次配置请先跑 `/setup-slow-thinking`。

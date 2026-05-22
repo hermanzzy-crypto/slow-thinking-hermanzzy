@@ -119,12 +119,27 @@ node <SKILL_DIR>/scripts/fetch-hn.mjs
 
 ---
 
+## Step 3 本地服务（serve.mjs）
+
+Step 3 由 `serve.mjs` 起一个**只监听 `127.0.0.1`、端口随机**的临时本地服务：
+
+- 用 `--port 0`（默认）让系统分配空闲端口，规避端口冲突
+- 服务在用户保存后约 1.5s 自行退出；45 分钟无人保存也会超时退出
+- 浏览器里点保存 → 同源 `POST /save` → 服务调 `sediment.mjs` 直写 Obsidian，**不下载文件**
+- 仅本机回环地址可访问，不对外暴露
+
+**降级**：用户若用 `file://` 直接打开 HTML（没走服务），保存按钮自动回退为「下载 JSON」，老链路依旧可用。
+
+---
+
 ## 故障排查
 
 | 症状 | 检查 |
 |------|------|
 | `state.mjs get` 返回空 | 跑 `/setup-slow-thinking` |
 | `fetch-hn.mjs` 报错 | Node 版本 ≥18？网络能访问 `news.ycombinator.com`？ |
-| HTML 渲染后浏览器没打开 | 在终端手动 `open <最后一行的路径>` |
-| `~/Downloads/slow-thinking-*.json` 不存在 | 浏览器下载路径是否被改？用户是否点了保存？ |
+| 浏览器没打开服务页 | 从 `<tmpdir>/slow-thinking/serve-url.txt` 取 URL 手动 `open` |
+| 点保存后没存进 Obsidian | 看后台 `serve.mjs` 日志：`SAVED` 成功 / `TIMEOUT` 超时；服务挂了会回退下载 JSON |
+| 走了下载兜底 | 用 `sediment.mjs --latest`，或点 HTML「📋 复制结果」粘回对话 |
+| `serve.mjs` 端口报错 | 极少见（用随机端口）；可显式 `--port <空闲端口>` |
 | 飞书同步失败 | `lark-cli auth login` 是否过期？`state.mjs set feishu disabled` 临时关掉 |
