@@ -34,9 +34,11 @@
    - 服务就绪后：stdout 打印 `URL http://127.0.0.1:<port>`，同时把 URL 写入
      `<tmpdir>/slow-thinking/serve-url.txt`
 
-5. **打开浏览器**指向那个 URL（从 stdout 或 `serve-url.txt` 取）：
-   - macOS：`open http://127.0.0.1:<port>`
-   - Linux：`xdg-open <url>`／Windows：`start <url>`
+5. **打开浏览器，并把 URL 一并发到对话里**（从 stdout 的 `URL ...` 行或 `serve-url.txt` 取）：
+   - 打开浏览器：macOS `open <url>`／Linux `xdg-open <url>`／Windows `start <url>`
+   - **必须**在对话回复里把这个 URL 文本明确发给用户，并附一句说明：
+     > 思考页面已打开：`http://127.0.0.1:<port>` —— 万一误关，复制这个链接重开即可（草稿会自动恢复）。链接在你保存后失效。
+   - 这样用户万一关掉标签页，对话里还留着入口
 
 6. **登记今日卡 ID**：
    ```bash

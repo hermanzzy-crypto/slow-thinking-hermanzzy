@@ -38,7 +38,7 @@ metadata:
 
 ### 💡 Step 3 — 所以呢？（3-4 min · HTML 交互）
 
-**不要在终端逐轮追问**。组装 payload → `serve.mjs` 后台起本地服务渲染 HTML → 打开浏览器让用户选卡填空。完整流程见 [HTML-FLOW.md](./HTML-FLOW.md)。
+**不要在终端逐轮追问**。组装 payload → `serve.mjs` 后台起本地服务渲染 HTML → 打开浏览器让用户选卡填空。**打开浏览器的同时，务必把本地服务 URL 一并发到对话里**（误关页面可凭此链接重开，草稿自动恢复）。完整流程见 [HTML-FLOW.md](./HTML-FLOW.md)。
 
 卡片内容生成规则（4 字段）和提问技巧见 [CARDS-FORMAT.md](./CARDS-FORMAT.md) —— **生成内容前必读**。
 
