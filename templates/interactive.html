@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>思考跑步机 · {{DATE}}</title>
 <style>
   :root {
@@ -25,6 +26,8 @@
     --color-tag-red-text: #F53F3F;
     --color-tag-blue-bg: #E8F3FF;
     --color-tag-blue-text: #1664FF;
+    --color-tag-green-bg: #E8FFEA;
+    --color-tag-green-text: #00B42A;
     --radius-card: 16px;
     --radius-mini: 12px;
     --radius-button: 6px;
@@ -46,7 +49,7 @@
     line-height: 1.6;
   }
 
-  /* Hero 区柔光背景（节制使用品牌色） */
+  /* Hero 区柔光背景 */
   .hero {
     position: relative;
     background:
@@ -136,7 +139,6 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-card);
     padding: 28px 32px;
-    transition: var(--transition-normal);
     position: relative;
     overflow: hidden;
   }
@@ -161,56 +163,68 @@
     color: var(--color-text-secondary);
     line-height: 1.75;
   }
-  .source-card .source-body a {
-    color: var(--color-brand-blue);
-    text-decoration: none;
-  }
+  .source-card .source-body a { color: var(--color-brand-blue); text-decoration: none; }
   .source-card .source-body a:hover { text-decoration: underline; }
 
-  /* 卡片栅格 */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    transition: var(--transition-normal);
+  /* 数据指标条 */
+  .stat-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 24px 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    margin: 32px 0 40px;
   }
-  .cards-grid.has-selection .card:not(.selected) {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin: 0;
-    border-width: 0;
-    overflow: hidden;
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
   }
-  .cards-grid.has-selection .card.selected {
-    grid-column: 1 / -1;
+  .stat-num .unit {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 4px;
+    color: var(--color-text-secondary);
+  }
+  .stat-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px; }
+  .stat-divider { width: 1px; height: 40px; background: var(--color-border-strong); }
+
+  /* 卡片列表（手风琴） */
+  .cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
-  /* 卡片基础 */
   .card {
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-card);
-    padding: 32px;
-    cursor: pointer;
     transition: var(--transition-normal);
-    position: relative;
+    overflow: hidden;
   }
-  .card:hover {
+  .card:hover { border-color: var(--color-border-strong); }
+  .card.open {
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
   }
-  .card.selected {
-    cursor: default;
-    box-shadow: var(--shadow-card-hover);
-  }
-  .card.selected:hover { transform: none; }
 
+  /* 卡片头（可点击折叠/展开） */
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 28px;
+    cursor: pointer;
+    user-select: none;
+  }
   .card-icon {
+    flex-shrink: 0;
     width: 40px;
     height: 40px;
     border-radius: 10px;
@@ -219,47 +233,70 @@
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(138, 91, 255, 0.2);
   }
+  .card-head-text { flex: 1; min-width: 0; }
+  .card-stage {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-capsule);
+    padding: 2px 10px;
+    margin-bottom: 6px;
+  }
   .card-name {
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 700;
     line-height: 1.35;
-    margin-bottom: 6px;
     letter-spacing: -0.2px;
   }
   .card-tagline {
     font-size: 13px;
     color: var(--color-text-tertiary);
     line-height: 1.5;
-    margin-bottom: 16px;
+    margin-top: 2px;
   }
-  .card-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--color-brand-blue);
-    font-weight: 500;
+  .card-status {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-capsule);
+    padding: 4px 12px;
   }
-  .card.selected .card-hint { display: none; }
+  .card-status.touched {
+    color: var(--color-tag-blue-text);
+    background: var(--color-tag-blue-bg);
+  }
+  .card-status.done {
+    color: var(--color-tag-green-text);
+    background: var(--color-tag-green-bg);
+  }
+  .card-chevron {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--color-text-tertiary);
+    transition: transform var(--transition-normal);
+  }
+  .card.open .card-chevron { transform: rotate(180deg); }
 
-  /* 展开后内容 */
-  .card-content { display: none; }
-  .card.selected .card-content {
+  /* 卡片展开内容 */
+  .card-content { display: none; padding: 0 28px 28px; }
+  .card.open .card-content {
     display: block;
-    animation: fadeIn 400ms ease-out;
-    margin-top: 24px;
-    padding-top: 24px;
+    animation: fadeIn 360ms ease-out;
     border-top: 1px solid var(--color-border);
+    padding-top: 24px;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .section-block { margin-bottom: 32px; }
+  .section-block { margin-bottom: 28px; }
   .section-block:last-child { margin-bottom: 0; }
 
   .block-label {
@@ -273,14 +310,8 @@
     text-transform: uppercase;
     margin-bottom: 12px;
   }
-  .block-label .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-brand-blue);
-  }
+  .block-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand-blue); }
 
-  /* 解读卡（mini-card 风格） */
   .reading-box {
     background: var(--color-soft-mix);
     border-radius: var(--radius-mini);
@@ -298,7 +329,6 @@
     line-height: 1.7;
   }
 
-  /* 问题块 */
   .question-block {
     background: var(--color-bg);
     border: 1px solid var(--color-border);
@@ -344,6 +374,7 @@
     resize: vertical;
     min-height: 60px;
     padding: 0;
+    overflow: hidden;
   }
   textarea::placeholder { color: var(--color-text-placeholder); }
   textarea:focus { outline: none; }
@@ -363,46 +394,45 @@
   .insight-block:focus-within { background: var(--color-bg); }
   .insight-block textarea { min-height: 70px; font-size: 15px; }
 
-  /* 数据指标条 */
-  .stat-bar {
+  /* 卡内导航（上一张 / 下一张） */
+  .card-nav {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 48px;
-    padding: 24px 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-    margin: 32px 0;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--color-border-strong);
   }
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    letter-spacing: -0.5px;
-    line-height: 1.1;
-  }
-  .stat-num .unit {
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 4px;
-    color: var(--color-text-secondary);
-  }
-  .stat-desc {
-    font-size: 12px;
-    color: var(--color-text-tertiary);
-    margin-top: 4px;
-  }
-  .stat-divider { width: 1px; height: 40px; background: var(--color-border-strong); }
+  .card-nav .spacer { flex: 1; }
 
-  /* 按钮区 */
+  /* 全局按钮区 */
   .actions {
     display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin-top: 48px;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 40px;
   }
-  .actions.hidden { display: none; }
+  .progress-row { font-size: 13px; color: var(--color-text-tertiary); }
+  .progress-row strong { color: var(--color-brand-blue); font-weight: 600; }
+  .action-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  /* 保存成功面板 */
+  .saved-panel { text-align: center; padding: 12px 0; animation: fadeIn 400ms ease-out; }
+  .saved-icon { font-size: 44px; line-height: 1; margin-bottom: 10px; }
+  .saved-title { font-size: 19px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; }
+  .saved-path {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-subtle);
+    padding: 6px 16px;
+    border-radius: var(--radius-capsule);
+    margin-bottom: 10px;
+    word-break: break-all;
+    max-width: 90%;
+  }
+  .saved-hint { font-size: 13px; color: var(--color-text-tertiary); }
 
   button {
     font-family: inherit;
@@ -413,8 +443,8 @@
     align-items: center;
     gap: 6px;
   }
+  button:disabled { opacity: .42; cursor: not-allowed; pointer-events: none; }
 
-  /* Hero 黑色胶囊（最强 CTA） */
   .btn-hero {
     background: var(--color-text-primary);
     color: #fff;
@@ -430,37 +460,27 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(29, 33, 41, 0.28);
   }
-
-  /* Primary 主蓝按钮 */
   .btn-primary {
     background: var(--color-brand-blue);
     color: #fff;
     height: 44px;
     padding: 0 24px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
-    border-radius: var(--radius-button);
+    border-radius: var(--radius-capsule);
   }
-  .btn-primary:hover {
-    background: var(--color-brand-blue-hover);
-    transform: translateY(-1px);
-  }
-
-  /* Secondary 描边按钮 */
+  .btn-primary:hover { background: var(--color-brand-blue-hover); transform: translateY(-1px); }
   .btn-secondary {
     background: var(--color-bg);
     color: var(--color-text-primary);
     border: 1px solid var(--color-border-strong);
     height: 44px;
     padding: 0 24px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     border-radius: var(--radius-capsule);
   }
-  .btn-secondary:hover {
-    border-color: var(--color-text-secondary);
-    background: var(--color-bg-subtle);
-  }
+  .btn-secondary:hover { border-color: var(--color-text-secondary); background: var(--color-bg-subtle); }
 
   /* Toast */
   .toast {
@@ -477,10 +497,11 @@
     box-shadow: 0 12px 32px rgba(0,0,0,0.18);
     transition: transform 400ms ease-out;
     z-index: 999;
+    max-width: 90vw;
+    text-align: center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* Footer */
   footer {
     background: #111827;
     color: #9CA3AF;
@@ -491,9 +512,7 @@
   }
   footer strong { color: #fff; font-weight: 600; }
 
-  /* 响应式 */
   @media (max-width: 1024px) {
-    .cards-grid { grid-template-columns: 1fr; }
     h1.display { font-size: 40px; }
     .section-title { font-size: 28px; }
   }
@@ -501,7 +520,10 @@
     .hero { padding: 56px 20px 40px; }
     .stat-bar { gap: 20px; flex-wrap: wrap; }
     .stat-divider { display: none; }
-    .actions { flex-direction: column; }
+    .card-header { padding: 20px; gap: 12px; }
+    .card-content { padding: 0 20px 20px; }
+    .action-buttons { flex-direction: column; width: 100%; }
+    .action-buttons button { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -511,7 +533,7 @@
   <div class="hero-inner">
     <div class="badge">🏃 思考跑步机 · Day · {{DATE}}</div>
     <h1 class="display">把答案放一放，<span class="gradient-text">先把问题想透</span></h1>
-    <p class="subtitle">每天 5 分钟，刻意切换思考视角。AI 当陪练，不当替身。</p>
+    <p class="subtitle">每天 5 分钟，依次走过 3 张思考卡，换 3 个角度看同一件事。AI 当陪练，不当替身。</p>
     <div class="meta-row">
       <span>今日身份 <strong id="identity">{{IDENTITY}}</strong></span>
       <span class="divider"></span>
@@ -533,14 +555,14 @@
 
   <section>
     <div class="section-header">
-      <h2 class="section-title">选一张思考卡，换个角度看</h2>
-      <p class="section-subtitle">点击卡片进入深度模式 · 已为你随机抽取 3 张</p>
+      <h2 class="section-title">依次走过 3 张思考卡</h2>
+      <p class="section-subtitle">点开一张 → 作答 → 「下一张卡」继续 · 全部填完后统一保存</p>
     </div>
 
     <div class="stat-bar">
       <div class="stat-item">
         <div class="stat-num">3<span class="unit">张卡</span></div>
-        <div class="stat-desc">今日思考视角</div>
+        <div class="stat-desc">今日匹配视角</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
@@ -549,16 +571,19 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <div class="stat-num">1<span class="unit">洞察</span></div>
-        <div class="stat-desc">每日核心 take-away</div>
+        <div class="stat-num">1<span class="unit">次保存</span></div>
+        <div class="stat-desc">最后统一沉淀</div>
       </div>
     </div>
 
-    <div class="cards-grid" id="cardsRow"></div>
+    <div class="cards-list" id="cardsList"></div>
 
-    <div class="actions hidden" id="actions">
-      <button class="btn-secondary" onclick="resetSelection()">← 换一张卡</button>
-      <button class="btn-hero" onclick="saveAll()">💾 保存今日思考</button>
+    <div class="actions" id="actions">
+      <div class="progress-row" id="progress"></div>
+      <div class="action-buttons">
+        <button class="btn-secondary" onclick="copyResult()">📋 复制结果</button>
+        <button class="btn-hero" id="saveBtn" onclick="saveAll()">💾 保存今日思考</button>
+      </div>
     </div>
   </section>
 
@@ -568,7 +593,7 @@
   <strong>思考跑步机</strong> · 让"自己想"重新变得稀缺 · {{DATE}}
 </footer>
 
-<div class="toast" id="toast">✅ 已保存到 ~/Downloads/</div>
+<div class="toast" id="toast">✅ 已保存</div>
 
 <script>
 // === 由 Claude 注入 ===
@@ -578,51 +603,68 @@ window.__META__ = {
   source: {{SOURCE_JSON}}
 };
 window.__CARDS__ = {{CARDS_JSON}};
-// 数据结构示例:
-// [{
-//   id: "first-principles",
-//   name: "🔬 第一性原理",
-//   tagline: "剥到不能再剥",
-//   logic: "把现象拆到最基本的物理/经济/人性事实，重新推一遍。",
-//   reading: "作为 [身份]，这意味着...",
-//   questions: ["Q1...", "Q2...", "Q3..."]
-// }, ...]
+// 数据结构（v2.0）:
+// [{ id, name, tagline, stage?, logic, reading, questions:[q1,q2,q3] }, ...]
 
-const row = document.getElementById('cardsRow');
+const list = document.getElementById('cardsList');
 const actions = document.getElementById('actions');
+const DRAFT_KEY = 'slow-thinking-draft-' + window.__META__.date;
 
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
+  ));
+}
+function autoResize(t) {
+  t.style.height = 'auto';
+  t.style.height = (t.scrollHeight + 2) + 'px';
+}
+function resizeCard(cardEl) {
+  cardEl.querySelectorAll('textarea').forEach(autoResize);
+}
+
+// ---- 渲染所有卡（手风琴）----
 window.__CARDS__.forEach((c, idx) => {
+  const icon = (String(c.name).match(/^\S+/) || ['💡'])[0];
+  const title = String(c.name).replace(/^\S+\s*/, '');
+  const isLast = idx === window.__CARDS__.length - 1;
   const el = document.createElement('div');
   el.className = 'card';
   el.dataset.id = c.id;
   el.dataset.idx = idx;
   el.innerHTML = `
-    <div class="card-icon">${(c.name.match(/^\S+/) || ['💡'])[0]}</div>
-    <div class="card-name">${c.name.replace(/^\S+\s*/, '')}</div>
-    <div class="card-tagline">${c.tagline}</div>
-    <span class="card-hint">点击展开 →</span>
+    <div class="card-header">
+      <div class="card-icon">${esc(icon)}</div>
+      <div class="card-head-text">
+        ${c.stage ? `<span class="card-stage">${esc(c.stage)}</span>` : ''}
+        <div class="card-name">${esc(title)}</div>
+        <div class="card-tagline">${esc(c.tagline)}</div>
+      </div>
+      <div class="card-status" data-status>未作答</div>
+      <div class="card-chevron">▾</div>
+    </div>
     <div class="card-content">
       <div class="section-block">
         <div class="block-label"><span class="dot"></span>底层逻辑</div>
-        <div class="logic-box">${c.logic}</div>
+        <div class="logic-box">${esc(c.logic)}</div>
       </div>
       <div class="section-block">
         <div class="block-label"><span class="dot"></span>本事件解读</div>
-        <div class="reading-box">${c.reading}</div>
+        <div class="reading-box">${esc(c.reading)}</div>
       </div>
       <div class="section-block">
         <div class="block-label"><span class="dot"></span>三个追问</div>
-        ${c.questions.map((q, i) => `
+        ${(c.questions || []).map((q, i) => `
           <div class="question-block">
-            <div class="question-text"><span class="question-num">Q${i+1}</span>${q}</div>
+            <div class="question-text"><span class="question-num">Q${i + 1}</span>${esc(q)}</div>
             <textarea data-field="answer" data-q="${i}" placeholder="写下你的回答..."></textarea>
           </div>
         `).join('')}
       </div>
       <div class="section-block">
-        <div class="block-label"><span class="dot"></span>我的核心感悟（一句话）</div>
+        <div class="block-label"><span class="dot"></span>这张卡的核心感悟（一句话 · 可选）</div>
         <div class="insight-block">
-          <textarea data-field="insight" placeholder="今天最值得带走的洞见是什么？"></textarea>
+          <textarea data-field="insight" placeholder="这个视角下，最值得带走的一句是什么？"></textarea>
         </div>
       </div>
       <div class="section-block">
@@ -631,74 +673,248 @@ window.__CARDS__.forEach((c, idx) => {
           <textarea data-field="hook" placeholder="这次没想透、明天想接着挖的点..."></textarea>
         </div>
       </div>
+      <div class="card-nav">
+        ${idx > 0
+          ? `<button class="btn-secondary" onclick="openCard(${idx - 1})">← 上一张</button>`
+          : `<span class="spacer"></span>`}
+        ${isLast
+          ? `<button class="btn-primary" onclick="gotoSave()">↓ 全部填完，去保存</button>`
+          : `<button class="btn-primary" onclick="openCard(${idx + 1})">下一张卡 →</button>`}
+      </div>
     </div>
   `;
-  el.addEventListener('click', (e) => {
-    if (e.target.tagName === 'TEXTAREA') return;
-    if (el.classList.contains('selected')) return;
-    selectCard(idx);
-  });
-  row.appendChild(el);
+  el.querySelector('.card-header').addEventListener('click', () => toggleCard(idx));
+  list.appendChild(el);
 });
 
-function selectCard(idx) {
-  document.querySelectorAll('.card').forEach((el, i) => {
-    el.classList.toggle('selected', i === idx);
-  });
-  document.getElementById('cardsRow').classList.add('has-selection');
-  actions.classList.remove('hidden');
-  setTimeout(() => {
-    document.querySelector('.card.selected').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 350);
+// ---- 输入委托：自增高 + 存草稿 + 更新进度 ----
+document.addEventListener('input', (e) => {
+  if (e.target.tagName !== 'TEXTAREA') return;
+  autoResize(e.target);
+  saveDraft();
+  updateProgress();
+});
+
+// ---- 快捷键 Cmd/Ctrl + S 保存 ----
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    const btn = document.getElementById('saveBtn');
+    if (btn && !btn.disabled) saveAll();
+  }
+});
+
+function toggleCard(idx) {
+  const card = list.children[idx];
+  const wasOpen = card.classList.contains('open');
+  [...list.children].forEach(c => c.classList.remove('open'));
+  if (!wasOpen) {
+    card.classList.add('open');
+    resizeCard(card);
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+  }
+}
+function openCard(idx) {
+  if (idx < 0 || idx >= list.children.length) return;
+  [...list.children].forEach(c => c.classList.remove('open'));
+  const card = list.children[idx];
+  card.classList.add('open');
+  resizeCard(card);
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+}
+function gotoSave() {
+  document.getElementById('actions').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function resetSelection() {
-  document.querySelectorAll('.card').forEach(el => el.classList.remove('selected'));
-  document.getElementById('cardsRow').classList.remove('has-selection');
-  actions.classList.add('hidden');
-  document.querySelector('.cards-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+// ---- 进度 + 每张卡状态 ----
+function cardState(cardEl) {
+  const ans = [...cardEl.querySelectorAll('textarea[data-field="answer"]')];
+  const answered = ans.filter(t => t.value.trim()).length;
+  const insight = cardEl.querySelector('textarea[data-field="insight"]').value.trim();
+  const hook = cardEl.querySelector('textarea[data-field="hook"]').value.trim();
+  return { total: ans.length, answered, insight, hook, touched: answered > 0 || !!insight || !!hook };
+}
+function updateProgress() {
+  let touchedCards = 0;
+  [...list.children].forEach((cardEl) => {
+    const s = cardState(cardEl);
+    if (s.touched) touchedCards++;
+    const badge = cardEl.querySelector('[data-status]');
+    if (!s.touched) {
+      badge.textContent = '未作答';
+      badge.className = 'card-status';
+    } else if (s.answered === s.total && s.total > 0) {
+      badge.textContent = '✓ 已完成';
+      badge.className = 'card-status done';
+    } else {
+      badge.textContent = `已答 ${s.answered}/${s.total}`;
+      badge.className = 'card-status touched';
+    }
+  });
+  const total = list.children.length;
+  document.getElementById('progress').innerHTML =
+    `已动笔 <strong>${touchedCards}/${total}</strong> 张卡 —— 全部填完后点保存统一沉淀`;
 }
 
-function saveAll() {
-  const selected = document.querySelector('.card.selected');
-  if (!selected) { alert('请先选一张卡'); return; }
-  const idx = parseInt(selected.dataset.idx);
-  const card = window.__CARDS__[idx];
-
-  const answers = [];
-  selected.querySelectorAll('textarea[data-field="answer"]').forEach(t => {
-    answers.push(t.value.trim());
+// ---- 草稿持久化（localStorage）----
+function collectDraft() {
+  const draft = { openIdx: null, values: {} };
+  const openEl = list.querySelector('.card.open');
+  if (openEl) draft.openIdx = parseInt(openEl.dataset.idx);
+  list.querySelectorAll('.card').forEach((card) => {
+    card.querySelectorAll('textarea').forEach((t) => {
+      if (t.value.trim()) {
+        const key = card.dataset.idx + ':' + t.dataset.field + ':' + (t.dataset.q || '0');
+        draft.values[key] = t.value;
+      }
+    });
   });
-  const insight = selected.querySelector('textarea[data-field="insight"]').value.trim();
-  const hook = selected.querySelector('textarea[data-field="hook"]').value.trim();
+  return draft;
+}
+function saveDraft() {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft())); } catch (e) {}
+}
+function restoreDraft() {
+  let draft = null;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
+  if (!draft || !draft.values) return;
+  let count = 0;
+  list.querySelectorAll('.card').forEach((card) => {
+    card.querySelectorAll('textarea').forEach((t) => {
+      const key = card.dataset.idx + ':' + t.dataset.field + ':' + (t.dataset.q || '0');
+      if (draft.values[key]) { t.value = draft.values[key]; count++; }
+    });
+  });
+  if (count > 0) {
+    if (draft.openIdx != null && list.children[draft.openIdx]) {
+      openCard(draft.openIdx);
+    }
+    showToast('🗂 已恢复上次未保存的草稿');
+  }
+}
 
-  const payload = {
+// ---- 组装结果：收集所有动过笔的卡 ----
+function buildPayload() {
+  const entries = [];
+  list.querySelectorAll('.card').forEach((cardEl) => {
+    const idx = parseInt(cardEl.dataset.idx);
+    const card = window.__CARDS__[idx];
+    const s = cardState(cardEl);
+    if (!s.touched) return;
+    const answers = [...cardEl.querySelectorAll('textarea[data-field="answer"]')].map(t => t.value.trim());
+    entries.push({
+      card: {
+        id: card.id, name: card.name, tagline: card.tagline,
+        logic: card.logic, reading: card.reading, questions: card.questions
+      },
+      answers,
+      insight: s.insight,
+      hook: s.hook
+    });
+  });
+  if (entries.length === 0) {
+    alert('还没填写任何内容 —— 至少在一张卡里写点什么再保存');
+    return null;
+  }
+  return {
     date: window.__META__.date,
     identity: window.__META__.identity,
     source: window.__META__.source,
-    card: {
-      id: card.id,
-      name: card.name,
-      tagline: card.tagline,
-      logic: card.logic,
-      reading: card.reading,
-      questions: card.questions
-    },
-    answers,
-    insight,
-    hook,
+    entries,
     saved_at: new Date().toISOString()
   };
+}
 
+// ---- 保存：服务直存优先，下载兜底 ----
+async function saveAll() {
+  const payload = buildPayload();
+  if (!payload) return;
+
+  if (location.protocol === 'http:' || location.protocol === 'https:') {
+    const saveBtn = document.getElementById('saveBtn');
+    const prevText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = '⏳ 正在存入 Obsidian...';
+    try {
+      const resp = await fetch('/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      if (data && data.ok) { markSaved(data.obsidian_path, payload.entries.length); return; }
+      throw new Error((data && data.error) || '服务保存失败');
+    } catch (e) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = prevText;
+      console.warn('服务直存失败，回退为下载 JSON：', e);
+      showToast('⚠️ 直存 Obsidian 失败，已回退为下载 JSON');
+    }
+  }
+  downloadJSON(payload);
+}
+
+function downloadJSON(payload) {
+  const ts = new Date().toTimeString().slice(0, 8).replace(/:/g, '');
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `slow-thinking-${window.__META__.date}.json`;
+  a.download = `slow-thinking-${window.__META__.date}-${ts}.json`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast('✅ 已保存到 ~/Downloads —— 回对话框说一声「完成了」即可沉淀');
+}
 
+function markSaved(obsidianPath, cardCount) {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  actions.innerHTML = `
+    <div class="saved-panel">
+      <div class="saved-icon">✅</div>
+      <div class="saved-title">今日思考已存入 Obsidian（${cardCount} 张卡）</div>
+      <div class="saved-path">${obsidianPath ? esc(obsidianPath) : '已沉淀（未配置 Obsidian 目录）'}</div>
+      <div class="saved-hint">思考肌肉 +${cardCount} 💪 —— 可以关闭这个页面了</div>
+    </div>`;
+  showToast('✅ 已直接存入 Obsidian');
+}
+
+function copyResult() {
+  const payload = buildPayload();
+  if (!payload) return;
+  const text = JSON.stringify(payload, null, 2);
+  const done = () => showToast('📋 已复制结果 —— 直接粘贴回对话框即可沉淀');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); }
+  catch (e) { alert('复制失败，请改用「💾 保存今日思考」'); }
+  document.body.removeChild(ta);
+}
+
+let toastTimer = null;
+function showToast(msg) {
   const toast = document.getElementById('toast');
+  toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+}
+
+// 启动：恢复草稿 + 初始化进度；默认展开第一张卡
+restoreDraft();
+updateProgress();
+if (!list.querySelector('.card.open') && list.children.length) {
+  list.children[0].classList.add('open');
+  resizeCard(list.children[0]);
 }
 </script>
 </body>
